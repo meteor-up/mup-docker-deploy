@@ -1,7 +1,7 @@
 {
-  "name": "mup-docker-deploy",
-  "version": "0.5.0",
-  "description": "Plugin for Meteor Up to deploy an app using a Dockerfile",
+  "name": "@sergeant61/mup-docker-deploy",
+  "version": "0.6.0",
+  "description": "Fork of mup-docker-deploy: deploy with Dockerfile, health checks, and rollback",
   "scripts": {
     "prepare": "npm run build",
     "build": "babel src --out-dir lib --copy-files",
@@ -9,12 +9,26 @@
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "zodern",
+  "author": "Sergeant61",
   "license": "MIT",
   "keywords": [
-    "meteor-up"
+    "meteor-up",
+    "mup",
+    "docker",
+    "deploy"
   ],
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sergeant61/mup-docker-deploy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sergeant61/mup-docker-deploy/issues"
+  },
+  "homepage": "https://github.com/Sergeant61/mup-docker-deploy#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.9",

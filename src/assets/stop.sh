@@ -1,6 +1,8 @@
 #!/bin/bash
 
 APPNAME=<%= appName %>
+STOP_TIMEOUT=<%= stopTimeout %>
 
-sudo docker rm -f $APPNAME || true
+sudo docker stop -t $STOP_TIMEOUT $APPNAME || true
+sudo docker rm $APPNAME || true
 sudo docker network disconnect bridge -f $APPNAME || true

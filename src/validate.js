@@ -14,7 +14,22 @@ export const schema = joi.object().keys({
     args: joi.array().items(joi.string()),
     networks: joi.array().items(joi.string()),
     imagePort: joi.number(),
+    stopTimeout: joi.number().integer().min(0),
+    healthCheck: joi.object().keys({
+      path: joi.string(),
+      expectedStatus: joi.number().integer().min(100).max(599),
+      interval: joi.number().positive(),
+      timeout: joi.number().positive(),
+      port: joi.number().integer().positive(),
+    }),
   }).default(),
+  healthCheck: joi.object().keys({
+    path: joi.string(),
+    expectedStatus: joi.number().integer().min(100).max(599),
+    interval: joi.number().positive(),
+    timeout: joi.number().positive(),
+    port: joi.number().integer().positive(),
+  }),
   volumes: joi.object(),
 });
 

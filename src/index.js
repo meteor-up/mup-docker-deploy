@@ -37,6 +37,7 @@ export const hooks = {
   'post.default.deploy': runIfEnabled('docker-deploy.deploy'),
   'post.default.reconfig': runIfEnabled('docker-deploy.reconfig', 'docker-deploy.start'),
   'post.default.start': runIfEnabled('docker-deploy.start'),
+  'post.default.restart': runIfEnabled('docker-deploy.start'),
   'post.default.stop': runIfEnabled('docker-deploy.stop'),
   'post.default.logs': runIfEnabled('docker-deploy.logs'),
 };

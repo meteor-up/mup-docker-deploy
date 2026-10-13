@@ -25,6 +25,26 @@ function getImagePrefix(privateRegistry) {
   return '';
 }
 
+function resolveHealthCheck(appConfig, publishedPort) {
+  const healthCheck = appConfig.healthCheck || (appConfig.docker && appConfig.docker.healthCheck) || {};
+  const path = healthCheck.path || '/';
+
+  return {
+    path: path.startsWith('/') ? path : `/${path}`,
+    expectedStatus: healthCheck.expectedStatus || 200,
+    interval: healthCheck.interval || 1,
+    timeout: healthCheck.timeout || 60,
+    port: healthCheck.port || publishedPort,
+  };
+}
+
+// Seconds between SIGTERM and SIGKILL when a container is replaced or stopped; docker's own default when unset
+function resolveStopTimeout(appConfig) {
+  const stopTimeout = appConfig.docker && appConfig.docker.stopTimeout;
+
+  return stopTimeout === undefined ? 10 : stopTimeout;
+}
+
 export function setup(api, nodemiral) {
   const config = api.getConfig().app;
 
@@ -111,6 +131,7 @@ export function reconfig(api, nodemiral) {
 
   const publishedPort = env.PORT || 80;
   const exposedPort = (appConfig.docker && appConfig.docker.imagePort) || 3000;
+  const healthCheck = resolveHealthCheck(appConfig, publishedPort);
 
   env.PORT = exposedPort;
 
@@ -141,6 +162,7 @@ export function reconfig(api, nodemiral) {
   });
 
   const localImageName = `${getImagePrefix(privateDockerRegistry)}${appConfig.name.toLowerCase()}:latest`;
+  const rollbackImage = `${getImagePrefix(privateDockerRegistry)}${appConfig.name.toLowerCase()}:previous`;
 
   list.copy('Sending Start Script', {
     src: api.resolvePath(__dirname, 'assets/start.sh'),
@@ -151,8 +173,25 @@ export function reconfig(api, nodemiral) {
       publishedPort,
       exposedPort,
       image: appConfig.type === 'remote-image' ? appConfig.image : localImageName,
+      rollbackImage,
+      stopTimeout: resolveStopTimeout(appConfig),
       volumes: appConfig.volumes,
       privateRegistry: privateDockerRegistry,
+    },
+  });
+
+  list.copy('Sending Deploy Check Script', {
+    src: api.resolvePath(__dirname, 'assets/deploy-check.sh'),
+    dest: `/opt/${appConfig.name}/config/deploy-check.sh`,
+    vars: {
+      appName: appConfig.name,
+      image: appConfig.type === 'remote-image' ? appConfig.image : localImageName,
+      rollbackImage,
+      path: healthCheck.path,
+      expectedStatus: healthCheck.expectedStatus,
+      interval: healthCheck.interval,
+      timeout: healthCheck.timeout,
+      port: healthCheck.port,
     },
   });
 
@@ -174,7 +213,15 @@ export function start(api, nodemiral) {
     },
   });
 
+  list.executeScript('Verify Deployment', {
+    script: api.resolvePath(__dirname, 'assets/run-deploy-check.sh'),
+    vars: {
+      appName: config.name,
+    },
+  });
+
   return api.runTaskList(list, sessions, {
+    series: true,
     verbose: api.verbose,
   });
 }
@@ -188,6 +235,7 @@ export function stop(api, nodemiral) {
     script: api.resolvePath(__dirname, 'assets/stop.sh'),
     vars: {
       appName: appConfig.name,
+      stopTimeout: resolveStopTimeout(appConfig),
     },
   });
 

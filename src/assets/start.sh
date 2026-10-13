@@ -6,16 +6,31 @@ APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
 ENV_FILE=$APP_PATH/config/env.list
 APP_IMAGE=<%= image %>
+ROLLBACK_IMAGE=<%= rollbackImage %>
 BIND="0.0.0.0"
 PUBLISHED_PORT=<%= publishedPort %>
 EXPOSED_PORT=<%= exposedPort %>
+STOP_TIMEOUT=<%= stopTimeout %>
 
-sudo docker rm -f $APPNAME || true
+if [ "${SKIP_PREVIOUS_TAG:-0}" != "1" ]; then
+  CURRENT_IMAGE_ID=$(sudo docker container inspect $APPNAME --format '{{.Image}}' 2>/dev/null || true)
+  if [ -n "$CURRENT_IMAGE_ID" ]; then
+    sudo docker tag $CURRENT_IMAGE_ID $ROLLBACK_IMAGE || true
+  fi
+
+  # SIGTERM first so the app can finish what it is doing; SIGKILL after STOP_TIMEOUT seconds
+  sudo docker stop -t $STOP_TIMEOUT $APPNAME || true
+  sudo docker rm $APPNAME || true
+else
+  # Rolling back: the container being replaced never became healthy, so there is nothing to wait for
+  sudo docker rm -f $APPNAME || true
+fi
 sudo docker network disconnect bridge -f $APPNAME || true
 
 sudo docker run \
   -d \
   --restart=always \
+  --stop-timeout=$STOP_TIMEOUT \
   --publish=$BIND:$PUBLISHED_PORT:$EXPOSED_PORT \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
