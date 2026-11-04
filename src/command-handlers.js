@@ -123,8 +123,6 @@ exports.reconfig = function reconfig(api, nodemiral) {
     }
   });
 
-  console.log(hostVars);
-
   list.copy('Sending Environment Variables', {
     src: api.resolvePath(__dirname, 'assets/env.list'),
     dest: `/opt/${appConfig.name}/config/env.list`,
