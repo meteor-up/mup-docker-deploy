@@ -6,15 +6,15 @@ export const schema = joi.object().keys({
   image: joi.string(),
   type: joi.string().required(),
   servers: joi.object().required().pattern(
-    /[/s/S]*/,
+    /[\s\S]*/,
     joi.object().keys(),
   ),
-  env: joi.object().pattern(/[/s/S]*/, [joi.string(), joi.number(), joi.bool()]).default(),
+  env: joi.object().pattern(/[\s\S]*/, [joi.string(), joi.number(), joi.bool()]),
   docker: joi.object().keys({
     args: joi.array().items(joi.string()),
     networks: joi.array().items(joi.string()),
     imagePort: joi.number(),
-  }).default(),
+  }),
   volumes: joi.object(),
 });
 
@@ -23,7 +23,7 @@ export default function validate(config, utils) {
 
   details = utils.combineErrorDetails(
     details,
-    joi.validate(config.app, schema, utils.VALIDATE_OPTIONS),
+    schema.validate(config.app, utils.VALIDATE_OPTIONS),
   );
 
   details = utils.combineErrorDetails(
