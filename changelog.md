@@ -1,3 +1,8 @@
+## 0.6.0 - Nov 4, 2026
+
+- minimum node version is now Node 18
+- update dependencies
+
 ## 0.5.0 - June 26, 2024
 
 - Support host vars
