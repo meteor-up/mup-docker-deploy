@@ -1,20 +1,15 @@
-import { v4 } from 'uuid';
+import { createHash } from 'crypto';
 import { tmpdir } from 'os';
 import { resolve } from 'path';
-import { create } from 'random-seed';
 import createBundle from './bundle';
 
 function tmpBuildPath(appPath, api) {
-  const rand = create(appPath);
-  const uuidNumbers = [];
-  for (let i = 0; i < 16; i++) {
-    uuidNumbers.push(rand(255));
-  }
+  const hash = createHash('sha256')
+    .update(appPath)
+    .digest('hex')
+    .slice(0, 32);
 
-  return api.resolvePath(
-    tmpdir(),
-    `mup-docker-deploy-${v4({ random: uuidNumbers })}`,
-  );
+  return api.resolvePath(tmpdir(), `mup-docker-deploy-${hash}`);
 }
 
 function getImagePrefix(privateRegistry) {
