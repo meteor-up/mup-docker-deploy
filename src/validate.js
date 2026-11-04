@@ -1,6 +1,6 @@
-import joi from 'joi';
+const joi = require('joi');
 
-export const schema = joi.object().keys({
+const schema = joi.object().keys({
   name: joi.string().min(1).required(),
   path: joi.string().min(1),
   image: joi.string(),
@@ -18,7 +18,7 @@ export const schema = joi.object().keys({
   volumes: joi.object(),
 });
 
-export default function validate(config, utils) {
+function validate(config, utils) {
   let details = [];
 
   details = utils.combineErrorDetails(
@@ -33,3 +33,6 @@ export default function validate(config, utils) {
 
   return utils.addLocation(details, 'app');
 }
+
+module.exports = validate;
+module.exports.schema = schema;

@@ -1,17 +1,17 @@
-import * as _commands from './commands';
-import validator from './validate';
+const commands = require('./commands');
+const validator = require('./validate');
 
-export const name = 'docker-deploy';
-export const description = 'Deploy an app using a docker image';
+exports.name = 'docker-deploy';
+exports.description = 'Deploy an app using a docker image';
 
-export const commands = _commands;
+exports.commands = commands;
 
 const appTypes = [
   'docker-image',
   'remote-image',
 ];
 
-export const validate = {
+exports.validate = {
   app(config, utils) {
     if (!config.app || !appTypes.includes(config.app.type)) {
       return [];
@@ -32,7 +32,7 @@ function runIfEnabled(...commandList) {
   };
 }
 
-export const hooks = {
+exports.hooks = {
   'post.default.setup': runIfEnabled('docker-deploy.setup'),
   'post.default.deploy': runIfEnabled('docker-deploy.deploy'),
   'post.default.reconfig': runIfEnabled('docker-deploy.reconfig', 'docker-deploy.start'),

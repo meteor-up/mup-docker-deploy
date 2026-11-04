@@ -15,7 +15,7 @@ function cleanTmp(tmpPath) {
   });
 }
 
-export default function createBundle(appPath, tmpPath, api) {
+module.exports = function createBundle(appPath, tmpPath, api) {
   console.log('tmp', tmpPath);
   cleanTmp(tmpPath);
 
@@ -52,4 +52,4 @@ export default function createBundle(appPath, tmpPath, api) {
       }
     });
   });
-}
+};

@@ -1,36 +1,36 @@
-import * as handlers from './command-handlers';
+const handlers = require('./command-handlers');
 
-export const setup = {
+exports.setup = {
   description: 'Prepare server to run the app',
   handler: handlers.setup,
 };
 
-export const deploy = {
+exports.deploy = {
   description: 'Deploy app',
   handler: handlers.deploy,
 };
 
-export const build = {
+exports.build = {
   description: 'Build the docker image',
   handler: handlers.build,
 };
 
-export const reconfig = {
+exports.reconfig = {
   description: 'Reconfig the app',
   handler: handlers.reconfig,
 };
 
-export const start = {
+exports.start = {
   description: 'Start the app',
   handler: handlers.start,
 };
 
-export const stop = {
+exports.stop = {
   description: 'Stop the app',
   handler: handlers.stop,
 };
 
-export const logs = {
+exports.logs = {
   description: 'View the app\'s logs',
   builder(yargs) {
     return yargs
@@ -52,12 +52,12 @@ export const logs = {
 
 // Hidden commands
 
-export const bundle = {
+exports.bundle = {
   description: false,
   handler: handlers.bundle,
 };
 
-export const push = {
+exports.push = {
   description: false,
   handler: handlers.push,
 };

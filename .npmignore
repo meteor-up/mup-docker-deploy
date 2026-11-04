@@ -1,4 +1,4 @@
-src
 tests
 node_modules
 .vscode
+.eslintrc.yml

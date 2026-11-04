@@ -3,9 +3,6 @@
   "version": "0.5.0",
   "description": "Plugin for Meteor Up to deploy an app using a Dockerfile",
   "scripts": {
-    "prepare": "npm run build",
-    "build": "babel src --out-dir lib --copy-files",
-    "build:watch": "npm run build -s -- -w",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,16 +16,9 @@
     "node": ">=18"
   },
   "devDependencies": {
-    "@babel/cli": "^7.17.6",
-    "@babel/core": "^7.17.9",
-    "@babel/preset-env": "^7.16.11",
-    "babel-eslint": "^10.1.0",
-    "chai": "^4.3.6",
-    "eslint": "^8.13.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4"
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0"
   },
   "dependencies": {
     "contains-path": "^1.0.0",

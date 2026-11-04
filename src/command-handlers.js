@@ -1,7 +1,7 @@
-import { createHash } from 'crypto';
-import { tmpdir } from 'os';
-import { resolve } from 'path';
-import createBundle from './bundle';
+const { createHash } = require('crypto');
+const { tmpdir } = require('os');
+const { resolve } = require('path');
+const createBundle = require('./bundle');
 
 function tmpBuildPath(appPath, api) {
   const hash = createHash('sha256')
@@ -20,7 +20,7 @@ function getImagePrefix(privateRegistry) {
   return '';
 }
 
-export function setup(api, nodemiral) {
+exports.setup = function setup(api, nodemiral) {
   const config = api.getConfig().app;
 
   if (!config) {
@@ -42,16 +42,16 @@ export function setup(api, nodemiral) {
   return api.runTaskList(list, sessions, {
     verbose: api.verbose,
   });
-}
+};
 
-export function bundle(api) {
+exports.bundle = function bundle(api) {
   const config = api.getConfig().app;
   const tmpPath = tmpBuildPath(config.path, api);
 
   return createBundle(config.path, tmpPath, api);
-}
+};
 
-export function push(api, nodemiral) {
+exports.push = function push(api, nodemiral) {
   const config = api.getConfig().app;
   const tmpPath = tmpBuildPath(config.path, api);
   const list = nodemiral.taskList('Pushing App');
@@ -68,9 +68,9 @@ export function push(api, nodemiral) {
     series: true,
     verbose: api.verbose,
   });
-}
+};
 
-export function build(api, nodemiral) {
+exports.build = function build(api, nodemiral) {
   const {
     app: appConfig,
     privateDockerRegistry,
@@ -92,15 +92,15 @@ export function build(api, nodemiral) {
     series: true,
     verbose: api.verbose,
   });
-}
+};
 
-export function reconfig(api, nodemiral) {
+exports.reconfig = function reconfig(api, nodemiral) {
   const list = nodemiral.taskList('Configuring App');
   const sessions = api.getSessions(['app']);
   const {
     app: appConfig,
     privateDockerRegistry,
-    servers
+    servers,
   } = api.getConfig();
   const { env } = appConfig;
 
@@ -109,16 +109,16 @@ export function reconfig(api, nodemiral) {
 
   env.PORT = exposedPort;
 
-  let hostVars = {};
-  Object.keys(appConfig.servers).forEach(key => {
-    const host = servers[key].host;
+  const hostVars = {};
+  Object.keys(appConfig.servers).forEach((key) => {
+    const { host } = servers[key];
     if (appConfig.servers[key].env) {
       hostVars[host] = {
         env: {
           ...appConfig.servers[key].env,
           // We treat the PORT specially and do not pass it to the container
-          PORT: exposedPort
-        }
+          PORT: exposedPort,
+        },
       };
     }
   });
@@ -132,7 +132,7 @@ export function reconfig(api, nodemiral) {
       env: env || {},
       appName: appConfig.name,
     },
-    hostVars
+    hostVars,
   });
 
   const localImageName = `${getImagePrefix(privateDockerRegistry)}${appConfig.name.toLowerCase()}:latest`;
@@ -155,9 +155,9 @@ export function reconfig(api, nodemiral) {
     series: true,
     verbose: api.verbose,
   });
-}
+};
 
-export function start(api, nodemiral) {
+exports.start = function start(api, nodemiral) {
   const config = api.getConfig().app;
   const sessions = api.getSessions(['app']);
   const list = nodemiral.taskList('Start App');
@@ -172,9 +172,9 @@ export function start(api, nodemiral) {
   return api.runTaskList(list, sessions, {
     verbose: api.verbose,
   });
-}
+};
 
-export function stop(api, nodemiral) {
+exports.stop = function stop(api, nodemiral) {
   const appConfig = api.getConfig().app;
   const sessions = api.getSessions(['app']);
   const list = nodemiral.taskList('Stop App');
@@ -187,9 +187,9 @@ export function stop(api, nodemiral) {
   });
 
   return api.runTaskList(list, sessions, { verbose: api.verbose });
-}
+};
 
-export async function deploy(api) {
+exports.deploy = async function deploy(api) {
   const { type } = api.getConfig().app;
 
   if (type !== 'remote-image') {
@@ -200,9 +200,9 @@ export async function deploy(api) {
 
   await api.runCommand('docker-deploy.reconfig');
   await api.runCommand('docker-deploy.start');
-}
+};
 
-export function logs(api) {
+exports.logs = function logs(api) {
   const config = api.getConfig().app;
   const args = api.getArgs();
   const sessions = api.getSessions(['app']);
@@ -212,4 +212,4 @@ export function logs(api) {
   }
 
   return api.getDockerLogs(config.name, sessions, args);
-}
+};
