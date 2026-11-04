@@ -1,17 +1,18 @@
 const containsPath = require('contains-path');
-const mkdirp = require('mkdirp');
+const fs = require('fs');
 const path = require('path');
 const tar = require('tar');
-const rimraf = require('rimraf');
 
 function cleanTmp(tmpPath) {
   try {
-    mkdirp.sync(tmpPath);
+    fs.mkdirSync(tmpPath, { recursive: true });
   } catch (e) {
     console.log(e);
   }
   console.log('rm path', path.join(tmpPath, '*'));
-  rimraf.sync(path.join(tmpPath, '*'));
+  fs.readdirSync(tmpPath).forEach((entry) => {
+    fs.rmSync(path.join(tmpPath, entry), { recursive: true, force: true });
+  });
 }
 
 export default function createBundle(appPath, tmpPath, api) {

@@ -2,7 +2,9 @@
 
 Deploy using a custom `Dockerfile`.
 
-This plugin is under development and is missing some features
+This plugin is under development and is missing some features.
+
+Requires Node 18 or newer.
 
 ## Getting started
 
